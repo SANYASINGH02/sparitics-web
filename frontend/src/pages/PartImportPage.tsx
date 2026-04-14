@@ -149,7 +149,16 @@ export default function PartImportPage() {
             event.preventDefault();
             const href = event.detail.href;
             setActiveHref(href);
-            if (href === '#logout') {
+            if (href === '#clean') {
+              if (window.confirm('Are you sure you want to delete all records?')) {
+                apiClient.delete('/api/database/clean').then(() => {
+                  setFeedback({ type: 'success', message: 'Database cleaned successfully.' });
+                  fetchParts();
+                }).catch(() => {
+                  setFeedback({ type: 'error', message: 'Failed to clean database.' });
+                });
+              }
+            } else if (href === '#logout') {
               handleLogout();
             } else {
               navigate(href);

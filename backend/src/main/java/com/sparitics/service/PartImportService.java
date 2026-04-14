@@ -43,6 +43,37 @@ public class PartImportService {
                         .body(Map.of("message", "No records found in Excel"));
             }
 
+            // Build column index map from header row
+            Row headerRow = sheet.getRow(0);
+            if (headerRow == null) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("message", "No records found in Excel"));
+            }
+
+            Map<String, Integer> colMap = new java.util.HashMap<>();
+            for (int c = 0; c < headerRow.getLastCellNum(); c++) {
+                Cell cell = headerRow.getCell(c);
+                if (cell != null) {
+                    String header = getCellStringValue(cell).toLowerCase().replaceAll("[^a-z0-9]", "");
+                    colMap.put(header, c);
+                }
+            }
+
+            // Find column indices (case-insensitive, stripped of special chars)
+            int colPartNumber = findColumn(colMap, "partnumber");
+            int colPartNumber1 = findColumn(colMap, "partnumber1");
+            int colPartDesc = findColumn(colMap, "partdescription");
+            int colCategory = findColumn(colMap, "category");
+            int colLandedCost = findColumn(colMap, "landedcost");
+            int colMRP = findColumn(colMap, "mrp");
+            int colRemark = findColumn(colMap, "remark");
+            int colMOQ = findColumn(colMap, "moq");
+
+            if (colPartNumber < 0) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("message", "Excel file must have a 'Partnumber' column. Found headers: " + colMap.keySet()));
+            }
+
             // Parse data rows (row 0 is header)
             for (int i = 1; i <= lastRow; i++) {
                 Row row = sheet.getRow(i);
@@ -50,20 +81,20 @@ public class PartImportService {
                     continue;
                 }
 
-                String partnumber = getCellStringValue(row.getCell(0));
+                String partnumber = getCellStringValue(row.getCell(colPartNumber));
                 if (partnumber.isEmpty()) {
                     continue;
                 }
 
                 PartMaster part = new PartMaster();
                 part.setPartnumber(partnumber);
-                part.setPartnumber1(getCellStringValue(row.getCell(1)));
-                part.setPartDescription(getCellStringValue(row.getCell(2)));
-                part.setCategory(getCellStringValue(row.getCell(3)));
-                part.setLandedcost(getCellBigDecimalValue(row.getCell(4)));
-                part.setMrp(getCellBigDecimalValue(row.getCell(5)));
-                part.setRemark(getCellStringValue(row.getCell(6)));
-                part.setMoq(getCellIntegerValue(row.getCell(7)));
+                part.setPartnumber1(colPartNumber1 >= 0 ? getCellStringValue(row.getCell(colPartNumber1)) : "");
+                part.setPartDescription(colPartDesc >= 0 ? getCellStringValue(row.getCell(colPartDesc)) : "");
+                part.setCategory(colCategory >= 0 ? getCellStringValue(row.getCell(colCategory)) : "");
+                part.setLandedcost(colLandedCost >= 0 ? getCellBigDecimalValue(row.getCell(colLandedCost)) : BigDecimal.ZERO);
+                part.setMrp(colMRP >= 0 ? getCellBigDecimalValue(row.getCell(colMRP)) : null);
+                part.setRemark(colRemark >= 0 ? getCellStringValue(row.getCell(colRemark)) : "");
+                part.setMoq(colMOQ >= 0 ? getCellIntegerValue(row.getCell(colMOQ)) : null);
 
                 parts.add(part);
                 allPartNumbers.add(partnumber);
@@ -107,6 +138,16 @@ public class PartImportService {
 
         return ResponseEntity.ok(Map.of("message", "Import successful",
                 "count", parts.size()));
+    }
+
+    private int findColumn(Map<String, Integer> colMap, String name) {
+        Integer idx = colMap.get(name);
+        if (idx != null) return idx;
+        // Try partial match
+        for (Map.Entry<String, Integer> entry : colMap.entrySet()) {
+            if (entry.getKey().contains(name)) return entry.getValue();
+        }
+        return -1;
     }
 
     private String getCellStringValue(Cell cell) {

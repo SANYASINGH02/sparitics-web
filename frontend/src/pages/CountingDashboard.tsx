@@ -197,7 +197,9 @@ export default function CountingDashboard() {
             event.preventDefault();
             const href = event.detail.href;
             setActiveHref(href);
-            if (href === '#logout') {
+            if (href === '#clean') {
+              setShowCleanModal(true);
+            } else if (href === '#logout') {
               handleLogout();
             } else {
               navigate(href);
