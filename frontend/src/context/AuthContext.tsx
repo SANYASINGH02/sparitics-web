@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import { createContext, useContext, useState, type ReactNode } from 'react';
 
 interface AuthContextType {
   token: string | null;
@@ -12,20 +12,9 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [token, setToken] = useState<string | null>(null);
-  const [userID, setUserID] = useState<string | null>(null);
-  const [userType, setUserType] = useState<string | null>(null);
-
-  useEffect(() => {
-    const storedToken = localStorage.getItem('token');
-    const storedUserID = localStorage.getItem('userID');
-    const storedUserType = localStorage.getItem('userType');
-    if (storedToken) {
-      setToken(storedToken);
-      setUserID(storedUserID);
-      setUserType(storedUserType);
-    }
-  }, []);
+  const [token, setToken] = useState<string | null>(() => localStorage.getItem('token'));
+  const [userID, setUserID] = useState<string | null>(() => localStorage.getItem('userID'));
+  const [userType, setUserType] = useState<string | null>(() => localStorage.getItem('userType'));
 
   const login = (newToken: string, newUserID: string, newUserType: string) => {
     localStorage.setItem('token', newToken);
@@ -52,6 +41,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth(): AuthContextType {
   const context = useContext(AuthContext);
   if (!context) {
