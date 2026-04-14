@@ -1,0 +1,37 @@
+spring:
+  application:
+    name: sparitics-backend
+
+  datasource:
+    url: jdbc:sqlserver://${DB_HOST:spariticsdb.database.windows.net}:${DB_PORT:1433};databaseName=${DB_NAME:SpariticsWeb};encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30
+    username: ${DB_USERNAME:devsa}
+    password: ${DB_PASSWORD:changeme}
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+
+    # HikariCP connection pool (active by default with spring-boot-starter-data-jpa)
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      idle-timeout: 300000
+      connection-timeout: 20000
+      pool-name: SpariticsHikariPool
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.SQLServerDialect
+
+  sql:
+    init:
+      mode: always
+      separator: ";"
+
+server:
+  port: ${SERVER_PORT:8080}
+
+jwt:
+  secret: ${JWT_SECRET:sparitics-default-secret-key-change-in-production-min-256-bits-long}
+  expiration-ms: ${JWT_EXPIRATION:86400000}
