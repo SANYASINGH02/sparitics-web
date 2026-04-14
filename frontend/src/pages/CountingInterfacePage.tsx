@@ -16,6 +16,7 @@ import SpaceBetween from '@cloudscape-design/components/space-between';
 import Alert from '@cloudscape-design/components/alert';
 import { useAuth } from '../context/AuthContext';
 import apiClient from '../services/apiClient';
+import MultiLocationDialog from '../components/MultiLocationDialog';
 
 function parseBarcode(raw: string): { partNumber: string; quantity: number } | null {
   const trimmed = raw.trim();
@@ -64,6 +65,10 @@ export default function CountingInterfacePage() {
   // Feedback
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  // Multi-location dialog
+  const [showMultiLocation, setShowMultiLocation] = useState(false);
+  const [multiLocationPartNumber, setMultiLocationPartNumber] = useState('');
 
   // Refs
   const barcodeInputRef = useRef<HTMLInputElement>(null);
@@ -153,7 +158,7 @@ export default function CountingInterfacePage() {
   };
 
   // Handle barcode scan (Enter key in hidden input)
-  const handleBarcodeKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleBarcodeKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
       const raw = (e.target as HTMLInputElement).value;
@@ -166,6 +171,19 @@ export default function CountingInterfacePage() {
       setPartNumber(result.partNumber);
       setQuantity(String(result.quantity));
       lookupPartDescription(result.partNumber);
+      // Check if part exists in tblCounting — if so, open multi-location dialog
+      try {
+        const response = await apiClient.get(
+          `/api/counting/locations?partNumber=${encodeURIComponent(result.partNumber.trim())}`
+        );
+        const locations: { location: string; finalQty: number }[] = response.data;
+        if (locations.length > 0) {
+          setMultiLocationPartNumber(result.partNumber.trim());
+          setShowMultiLocation(true);
+        }
+      } catch {
+        // ignore
+      }
       // Clear the hidden input
       (e.target as HTMLInputElement).value = '';
     }
@@ -177,12 +195,25 @@ export default function CountingInterfacePage() {
     lookupPartDescription(value);
   };
 
-  // Handle part number blur — check already counted + lookup description
-  const handlePartNumberBlur = () => {
+  // Handle part number blur — check already counted + lookup description + open multi-location
+  const handlePartNumberBlur = async () => {
     if (partNumber.trim()) {
       lookupPartDescription(partNumber);
       if (location.trim()) {
         checkAlreadyCounted(partNumber, location);
+      }
+      // Check if part exists in tblCounting — if so, open multi-location dialog
+      try {
+        const response = await apiClient.get(
+          `/api/counting/locations?partNumber=${encodeURIComponent(partNumber.trim())}`
+        );
+        const locations: { location: string; finalQty: number }[] = response.data;
+        if (locations.length > 0) {
+          setMultiLocationPartNumber(partNumber.trim());
+          setShowMultiLocation(true);
+        }
+      } catch {
+        // ignore — non-critical check
       }
     }
   };
@@ -450,6 +481,18 @@ export default function CountingInterfacePage() {
               </SpaceBetween>
             </Form>
           </Container>
+
+          <MultiLocationDialog
+            visible={showMultiLocation}
+            partNumber={multiLocationPartNumber}
+            onDismiss={() => setShowMultiLocation(false)}
+            onSuccess={() => {
+              // Refresh location suggestions if part number is still set
+              if (partNumber.trim()) {
+                fetchLocationSuggestions(partNumber);
+              }
+            }}
+          />
         </SpaceBetween>
       }
       toolsHide
