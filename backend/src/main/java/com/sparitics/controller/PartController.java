@@ -44,6 +44,18 @@ public class PartController {
         return ResponseEntity.ok(partMasterRepository.findAll());
     }
 
+    @GetMapping("/lookup")
+    public ResponseEntity<?> lookupPart(@RequestParam("partNumber") String partNumber) {
+        return partMasterRepository.findByPartnumber(partNumber.trim())
+                .map(part -> ResponseEntity.ok(Map.of(
+                        "partNumber", part.getPartnumber(),
+                        "partDescription", part.getPartDescription(),
+                        "category", part.getCategory(),
+                        "landedCost", part.getLandedcost(),
+                        "moq", part.getMoq() != null ? part.getMoq() : 0)))
+                .orElse(ResponseEntity.ok(Map.of()));
+    }
+
     @DeleteMapping("/truncate")
     public ResponseEntity<?> truncateParts() {
         partMasterRepository.truncateAll();

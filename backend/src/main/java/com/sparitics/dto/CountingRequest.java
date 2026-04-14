@@ -6,6 +6,7 @@ public class CountingRequest {
     private Integer quantity;
     private String location;
     private String countingMode;
+    private String remark;
 
     public String getPartNumber() {
         return partNumber;
@@ -37,5 +38,13 @@ public class CountingRequest {
 
     public void setCountingMode(String countingMode) {
         this.countingMode = countingMode;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
     }
 }

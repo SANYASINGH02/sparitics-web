@@ -34,21 +34,22 @@ public class CountingService {
         String location = request.getLocation();
         int quantity = request.getQuantity();
         String mode = request.getCountingMode();
+        String remark = request.getRemark() != null ? request.getRemark() : "";
         LocalDateTime now = LocalDateTime.now();
 
         Optional<CountingRecord> existing =
                 countingRecordRepository.findByPartnumberAndLocation(partNumber, location);
 
         if (existing.isPresent()) {
-            return updateExistingRecord(existing.get(), quantity, mode, userName, now);
+            return updateExistingRecord(existing.get(), quantity, mode, userName, remark, now);
         } else {
-            return insertNewRecord(partNumber, location, quantity, mode, userName, now);
+            return insertNewRecord(partNumber, location, quantity, mode, userName, remark, now);
         }
     }
 
     private CountingResponse updateExistingRecord(CountingRecord record, int quantity,
                                                    String mode, String userName,
-                                                   LocalDateTime now) {
+                                                   String remark, LocalDateTime now) {
         int previousQty = record.getFinalQty();
         record.setFinalQty(quantity);
         record.setDatemodi(now);
@@ -56,7 +57,7 @@ public class CountingService {
         record.setRecheckDateadded(now);
         record.setRecheckFlag("Y");
         record.setModicount(record.getModicount() + 1);
-        record.setRecheckRemark(record.getRemark());
+        record.setRecheckRemark(remark);
         record.setRecheckUser(userName);
         record.setCountingby(mode);
 
@@ -67,7 +68,8 @@ public class CountingService {
 
     private CountingResponse insertNewRecord(String partNumber, String location,
                                               int quantity, String mode,
-                                              String userName, LocalDateTime now) {
+                                              String userName, String remark,
+                                              LocalDateTime now) {
         Optional<PartMaster> partOpt = partMasterRepository.findByPartnumber(partNumber);
 
         CountingRecord record = new CountingRecord();
@@ -93,14 +95,14 @@ public class CountingService {
             record.setPartdesc(part.getPartDescription());
             record.setPartPrice(part.getLandedcost());
             record.setCategory(part.getCategory());
-            record.setRemark(part.getRemark() != null ? part.getRemark() : "");
+            record.setRemark(remark.isEmpty() ? (part.getRemark() != null ? part.getRemark() : "") : remark);
             record.setMoq(part.getMoq() != null ? part.getMoq() : 0);
             record.setNotInPartMaster("0");
         } else {
             record.setPartdesc("");
             record.setPartPrice(BigDecimal.ZERO);
             record.setCategory("");
-            record.setRemark("");
+            record.setRemark(remark);
             record.setMoq(0);
             record.setNotInPartMaster("1");
         }
