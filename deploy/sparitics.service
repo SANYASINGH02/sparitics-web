@@ -1,0 +1,20 @@
+[Unit]
+Description=Sparitics Spring Boot Backend
+After=mysql.service
+Requires=mysql.service
+
+[Service]
+User=www-data
+WorkingDirectory=/var/www/sparitics/backend
+ExecStart=/usr/bin/java -jar sparitics-backend.jar
+Environment=DB_HOST=localhost
+Environment=DB_PORT=3306
+Environment=DB_NAME=sparitics_web
+Environment=DB_USERNAME=sparitics_user
+Environment=DB_PASSWORD=CHANGE_ME
+Environment=JWT_SECRET=CHANGE_ME_TO_A_LONG_RANDOM_STRING
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
