@@ -126,7 +126,9 @@ export default function CountingDashboard() {
   const handleExport = async () => {
     try {
       const response = await apiClient.get('/api/counting/export', { responseType: 'blob' });
-      const filename = response.headers['content-disposition']?.split('filename=')[1] || 'CountingExport.xlsx';
+      const disposition = response.headers['content-disposition'] || '';
+      const match = disposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+      const filename = match ? match[1].replace(/['"]/g, '') : 'CountingExport.xlsx';
       saveAs(response.data, filename);
     } catch {
       setFeedback({ type: 'error', message: 'Export failed.' });
@@ -325,6 +327,7 @@ export default function CountingDashboard() {
         </SpaceBetween>
       }
       toolsHide
+      contentType="table"
     />
   );
 }

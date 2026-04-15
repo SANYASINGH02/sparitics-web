@@ -255,6 +255,7 @@ export default function PartImportPage() {
         </SpaceBetween>
       }
       toolsHide
+      contentType="table"
     />
   );
 }

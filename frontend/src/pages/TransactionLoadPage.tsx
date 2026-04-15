@@ -155,6 +155,7 @@ export default function TransactionLoadPage() {
         </SpaceBetween>
       }
       toolsHide
+      contentType="table"
     />
   );
 }
