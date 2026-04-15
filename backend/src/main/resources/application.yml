@@ -3,7 +3,7 @@ spring:
     name: sparitics-backend
 
   datasource:
-    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:sparitics_web}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:sparitics_web}?useSSL=${DB_SSL:false}&allowPublicKeyRetrieval=true&serverTimezone=UTC&requireSSL=${DB_SSL:false}
     username: ${DB_USERNAME:root}
     password: ${DB_PASSWORD:}
     driver-class-name: com.mysql.cj.jdbc.Driver
