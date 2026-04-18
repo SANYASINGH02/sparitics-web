@@ -22,6 +22,9 @@ public interface PartMasterRepository extends JpaRepository<PartMaster, Integer>
 
     boolean existsByPartnumber(String partnumber);
 
+    @Query("SELECT p.partnumber FROM PartMaster p WHERE p.partnumber IN :partnumbers")
+    List<String> findExistingPartnumbers(@org.springframework.data.repository.query.Param("partnumbers") List<String> partnumbers);
+
     @Modifying
     @Transactional
     @Query(value = "TRUNCATE TABLE PartMaster", nativeQuery = true)

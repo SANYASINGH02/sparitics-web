@@ -24,6 +24,9 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
         physical_naming_strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+        jdbc:
+          batch_size: 500
+        order_inserts: true
         format_sql: true
 
   sql:

@@ -120,21 +120,21 @@ public class PartImportService {
                             "duplicates", new ArrayList<>(duplicates)));
         }
 
-        // Check against existing records in DB
-        List<String> existingInDb = new ArrayList<>();
-        for (String pn : allPartNumbers) {
-            if (partMasterRepository.existsByPartnumber(pn)) {
-                existingInDb.add(pn);
-            }
-        }
+        // Check against existing records in DB — single batch query instead of N queries
+        List<String> existingInDb = partMasterRepository.findExistingPartnumbers(allPartNumbers);
         if (!existingInDb.isEmpty()) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(Map.of("message", "These Partnumbers already exist in the database",
                             "existing", existingInDb));
         }
 
-        // Bulk insert
-        partMasterRepository.saveAll(parts);
+        // Bulk insert in batches of 500
+        int batchSize = 500;
+        for (int i = 0; i < parts.size(); i += batchSize) {
+            int end = Math.min(i + batchSize, parts.size());
+            partMasterRepository.saveAll(parts.subList(i, end));
+            partMasterRepository.flush();
+        }
 
         return ResponseEntity.ok(Map.of("message", "Import successful",
                 "count", parts.size()));
