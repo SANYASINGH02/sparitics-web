@@ -112,9 +112,13 @@ export default function UserManagementPage() {
 
   const handleUpdateUser = async () => {
     setFeedback(null);
+    if (!userID.trim()) {
+      setFeedback({ type: 'error', message: 'Please select a user to update.' });
+      return;
+    }
     setSubmitting(true);
     try {
-      await apiClient.put(`/api/users/${userID}`, {
+      await apiClient.put(`/api/users/${encodeURIComponent(userID)}`, {
         fullName,
         phoneNumber,
         password,
@@ -126,11 +130,8 @@ export default function UserManagementPage() {
     } catch (err: unknown) {
       if (err && typeof err === 'object' && 'response' in err) {
         const axiosErr = err as { response?: { status?: number; data?: { message?: string } } };
-        if (axiosErr.response?.status === 404) {
-          setFeedback({ type: 'error', message: axiosErr.response?.data?.message || 'User not found.' });
-        } else {
-          setFeedback({ type: 'error', message: 'Failed to update user.' });
-        }
+        const message = axiosErr.response?.data?.message || `Failed to update user (status: ${axiosErr.response?.status}).`;
+        setFeedback({ type: 'error', message });
       } else {
         setFeedback({ type: 'error', message: 'Unable to connect to the server.' });
       }
@@ -141,20 +142,21 @@ export default function UserManagementPage() {
 
   const handleDeleteUser = async () => {
     setFeedback(null);
+    if (!userID.trim()) {
+      setFeedback({ type: 'error', message: 'Please select a user to delete.' });
+      return;
+    }
     setSubmitting(true);
     try {
-      await apiClient.delete(`/api/users/${userID}`);
+      await apiClient.delete(`/api/users/${encodeURIComponent(userID)}`);
       setFeedback({ type: 'success', message: 'User deleted successfully.' });
       clearForm();
       await fetchUsers();
     } catch (err: unknown) {
       if (err && typeof err === 'object' && 'response' in err) {
         const axiosErr = err as { response?: { status?: number; data?: { message?: string } } };
-        if (axiosErr.response?.status === 404) {
-          setFeedback({ type: 'error', message: axiosErr.response?.data?.message || 'User not found.' });
-        } else {
-          setFeedback({ type: 'error', message: 'Failed to delete user.' });
-        }
+        const message = axiosErr.response?.data?.message || `Failed to delete user (status: ${axiosErr.response?.status}).`;
+        setFeedback({ type: 'error', message });
       } else {
         setFeedback({ type: 'error', message: 'Unable to connect to the server.' });
       }
