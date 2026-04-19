@@ -39,9 +39,6 @@ public class UserController {
         if (isBlank(request.getFullName())) {
             missingFields.add("fullName");
         }
-        if (isBlank(request.getPhoneNumber())) {
-            missingFields.add("phoneNumber");
-        }
         if (isBlank(request.getPassword())) {
             missingFields.add("password");
         }
@@ -67,7 +64,7 @@ public class UserController {
         User user = new User();
         user.setUserId(request.getUserID().trim());
         user.setFullName(request.getFullName().trim());
-        user.setPhoneNumber(request.getPhoneNumber().trim());
+        user.setPhoneNumber(request.getPhoneNumber() != null ? request.getPhoneNumber().trim() : null);
         user.setPassword(request.getPassword().trim());
         user.setUserType(request.getUserType().trim());
 

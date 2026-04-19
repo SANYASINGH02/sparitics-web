@@ -19,70 +19,70 @@ public class CountingRecord {
     @Column(name = "Id")
     private Integer id;
 
-    @Column(name = "DealerID")
+    @Column(name = "DealerID", nullable = false)
     private Integer dealerId;
 
-    @Column(name = "UserName", length = 200)
+    @Column(name = "UserName", nullable = false, length = 200)
     private String userName;
 
-    @Column(name = "Partnumber", length = 200)
+    @Column(name = "Partnumber", nullable = false, length = 200)
     private String partnumber;
 
-    @Column(name = "Location", length = 200)
+    @Column(name = "Location", nullable = false, length = 200)
     private String location;
 
-    @Column(name = "Partdesc", length = 200)
+    @Column(name = "Partdesc", nullable = false, length = 200)
     private String partdesc;
 
-    @Column(name = "PartPrice", precision = 18, scale = 4)
+    @Column(name = "PartPrice", nullable = false, precision = 18, scale = 4)
     private BigDecimal partPrice;
 
-    @Column(name = "count")
+    @Column(name = "count", nullable = false)
     private Integer count;
 
-    @Column(name = "Category", length = 200)
+    @Column(name = "Category", nullable = false, length = 200)
     private String category;
 
-    @Column(name = "Remark", length = 200)
+    @Column(name = "Remark", nullable = false, length = 200)
     private String remark;
 
-    @Column(name = "MOQ")
+    @Column(name = "MOQ", nullable = false)
     private Integer moq;
 
-    @Column(name = "NotInPartMaster", length = 200)
+    @Column(name = "NotInPartMaster", nullable = false, length = 200)
     private String notInPartMaster;
 
-    @Column(name = "Dateadded")
+    @Column(name = "Dateadded", nullable = false)
     private LocalDateTime dateadded;
 
-    @Column(name = "Datemodi")
+    @Column(name = "Datemodi", nullable = false)
     private LocalDateTime datemodi;
 
-    @Column(name = "Recheck_User", length = 200)
+    @Column(name = "Recheck_User", nullable = false, length = 200)
     private String recheckUser;
 
-    @Column(name = "Recheck_Count")
+    @Column(name = "Recheck_Count", nullable = false)
     private Integer recheckCount;
 
-    @Column(name = "Recheck_Remark", length = 200)
+    @Column(name = "Recheck_Remark", nullable = false, length = 200)
     private String recheckRemark;
 
-    @Column(name = "Recheck_Dateadded")
+    @Column(name = "Recheck_Dateadded", nullable = false)
     private LocalDateTime recheckDateadded;
 
-    @Column(name = "TransactedPart", length = 20)
+    @Column(name = "TransactedPart", nullable = false, length = 20)
     private String transactedPart;
 
-    @Column(name = "RecheckFlag", length = 20)
+    @Column(name = "RecheckFlag", nullable = false, length = 20)
     private String recheckFlag;
 
-    @Column(name = "Final_Qty")
+    @Column(name = "Final_Qty", nullable = false)
     private Integer finalQty;
 
-    @Column(name = "Countingby", length = 100)
+    @Column(name = "Countingby", nullable = false, length = 100)
     private String countingby;
 
-    @Column(name = "modicount")
+    @Column(name = "modicount", nullable = false)
     private Integer modicount;
 
     public CountingRecord() {

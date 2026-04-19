@@ -28,10 +28,10 @@ public class DatabaseController {
         try {
             partMasterRepository.truncateAll();
             countingRecordRepository.truncateAll();
-            return ResponseEntity.ok(Map.of("message", "Database cleaned successfully. PartMaster and tblCounting tables truncated."));
+            return ResponseEntity.ok(Map.of("message", "Database cleaned successfully. PartMaster and Counting tables truncated."));
         } catch (Exception e) {
             return ResponseEntity.internalServerError()
-                    .body(Map.of("message", "Failed to clean database: " + e.getMessage()));
+                    .body(Map.of("message", "Failed to clean the database: " + e.getMessage()));
         }
     }
 }

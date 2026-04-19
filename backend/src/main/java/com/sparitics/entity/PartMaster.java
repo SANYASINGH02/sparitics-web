@@ -18,7 +18,7 @@ public class PartMaster {
     @Column(name = "ID")
     private Integer id;
 
-    @Column(name = "Partnumber", nullable = false, length = 200)
+    @Column(name = "Partnumber", nullable = false, length = 200, unique = true)
     private String partnumber;
 
     @Column(name = "Partnumber1", nullable = false, length = 200)
